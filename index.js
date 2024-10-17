@@ -1,6 +1,6 @@
 import { Web5 } from '@web5/api';
 import { VCProtocolDefinition } from './src/protocols/index.js';
-import { IssueKcc } from './test/Functions/index.js';
+import { IssueKcc } from './tests/Functions/index.js';
 import { GetWritePermissions } from "./src/services/index.js";
 
 const ALICE_DID = "did:dht:rr1w5z9hdjtt76e6zmqmyyxc5cfnwjype6prz45m6z1qsbm8yjao"
