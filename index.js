@@ -1,6 +1,6 @@
 import { Web5 } from '@web5/api';
 import { VCProtocolDefinition } from './src/protocols/index.js';
-import { IssueKcc } from './tests/Functions/index.js';
+import { IssueKcc } from './src/VerifiableCredentials/index.js';
 import { GetWritePermissions } from "./src/services/index.js";
 
 const ALICE_DID = "did:dht:rr1w5z9hdjtt76e6zmqmyyxc5cfnwjype6prz45m6z1qsbm8yjao"
@@ -84,6 +84,7 @@ if (dwncreationstatus == DWNCREATION_STATUS_ENUM.success) {
     if (SendRecord == undefined) {
       throw new Error("There seems to be an error in the way you are sending your records");
     }
+    console.log("Send record ID is: ", SendRecord.id);
     // Immediately send record to users remote DWNs (optional)
     const { status: sendStatus } = await SendRecord.send(ALICE_DID);
     console.log("Record send status: ", sendStatus);

@@ -1,1 +1,1 @@
-export { default as IssueKCC } from "./KCCIssuance.js";
+export { default as IssueKcc } from "./KCCIssuance.js";
