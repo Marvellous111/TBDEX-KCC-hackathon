@@ -1,0 +1,1 @@
+export { default as IssueKCC } from "./KCCIssuance.js";

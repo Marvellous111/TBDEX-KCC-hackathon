@@ -1,0 +1,1 @@
+export { default as GetWritePermissions } from "./GetPermission.js";

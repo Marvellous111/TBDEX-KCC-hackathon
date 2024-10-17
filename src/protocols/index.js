@@ -1,0 +1,1 @@
+export { default as VCProtocolDefinition } from "./vc-protocol.js";
