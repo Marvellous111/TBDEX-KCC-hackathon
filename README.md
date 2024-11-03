@@ -14,7 +14,14 @@ node index.js
 
 This project was created using `npm init`.
 
-# ALL STEPS WERE FOLLOWED IN THE CODEBASE
+# ALL STEPS FOLLOWED IN THE INSTRUCTIONS
+
+1. Creating the DID and DWN as the issuer using the Community DWN.
+2. Issuing Alice a KCC that includes evidence and changing it to a VC JWT.
+3. Installing protocol to issuers DWN.
+4. Obtain permission to write to Alice DWN.
+5. Store the VC JWT as a private record in Alice DWN.
+6. Get Record Id from Alice DID DWN Record.
 
 # Functionalities
 
