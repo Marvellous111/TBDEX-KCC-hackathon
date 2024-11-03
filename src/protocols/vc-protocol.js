@@ -40,7 +40,8 @@ const VCProtocolDefinition = {
                   "role": "judge",
                   "can": [
                       "query",
-                      "read"
+                      "read",
+                      "subscribe"
                   ]
               }
           ]

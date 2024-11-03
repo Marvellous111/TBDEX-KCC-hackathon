@@ -7,7 +7,8 @@ const ALICE_DID = "did:dht:rr1w5z9hdjtt76e6zmqmyyxc5cfnwjype6prz45m6z1qsbm8yjao"
 const DWNCREATION_STATUS_ENUM = {
   success: "success",
   failure: "failure"
-}
+};
+Object.freeze(DWNCREATION_STATUS_ENUM);
 var dwncreationstatus = DWNCREATION_STATUS_ENUM.failure;
 
 
@@ -25,12 +26,15 @@ const {web5, did: issuerDid} = await Web5.connect({
     onFailure: (error) => {
       dwncreationstatus = DWNCREATION_STATUS_ENUM.failure;
       console.error("An error occured while creating the issuers DID, DWN");
-      console.error("Error message: ", error);
+      throw new Error("Error message: ", error);
     }
   }
-})
-if (dwncreationstatus == DWNCREATION_STATUS_ENUM.success) {
-  // Creating the issuers bearer did
+});
+
+if (dwncreationstatus == DWNCREATION_STATUS_ENUM.failure) {
+  throw new Error("An error occured due to creating Issuers DWN hence the rest of the code won't run.");
+}
+// Creating the issuers bearer did
   const { did: issuerBearerDid } = await web5.agent.identity.get({ didUri: issuerDid });
 
   //STEP 2: Issuing Alice a KCC that includes evidence and changing it to a VC JWT.
@@ -39,7 +43,7 @@ if (dwncreationstatus == DWNCREATION_STATUS_ENUM.success) {
     var signedVc = await vc.sign({ did: issuerBearerDid });
   } catch (error) {
     console.error("An error occured while creating a DID and DWN with the DIF community DWN Instance");
-    console.error("Error message: ", error);
+    throw new Error("Error message: ", error);
   }
 
   //STEP 3: Installing protocol to issuers DWN
@@ -51,11 +55,11 @@ if (dwncreationstatus == DWNCREATION_STATUS_ENUM.success) {
     });
     console.log("Protocol installation status: ", protocolStatus); 
     //sends protocol to remote DWNs immediately (vs waiting for sync)
-    const { status: protocolSendStatus } = await protocol?.send(issuerDid);
+    const { status: protocolSendStatus } = await protocol.send(issuerDid);
     console.log("Protocol send status: ", protocolSendStatus);
   } catch (error) {
     console.error("An error occured while installing protocol on Issuers DWN");
-    console.error("Error message: ", error);
+    throw new Error("Error message: ", error);
   }
 
 
@@ -65,7 +69,7 @@ if (dwncreationstatus == DWNCREATION_STATUS_ENUM.success) {
     console.log(permission); 
   } catch (error) {
     console.error("An error occured while getting permission to write to Alice DWN");
-    console.error("Error message: ", error);
+    throw new Error("Error message: ", error);
   }
 
   //STEP 5: Store the VC JWT as a private record in Alice DWN
@@ -81,17 +85,40 @@ if (dwncreationstatus == DWNCREATION_STATUS_ENUM.success) {
         protocol: VCProtocolDefinition.protocol,
       }
     });
-    if (SendRecord == undefined) {
+    if (typeof SendRecord === 'undefined') {
       throw new Error("There seems to be an error in the way you are sending your records");
     }
-    console.log("Send record ID is: ", SendRecord.id);
+    console.log("User record is: ", SendRecord.id);
     // Immediately send record to users remote DWNs (optional)
     const { status: sendStatus } = await SendRecord.send(ALICE_DID);
     console.log("Record send status: ", sendStatus);
   } catch (error) {
     console.error("An error occured while writing to Alice DWN");
-    console.error("Error message: ", error);
+    throw new Error(error);
   }
-} else {
-  throw new Error("An error occured due to creating Issuers DWN hence the rest of the code won't run.");
-}
+  //STEP 6: Get Record Id from Alice DID DWN Record
+  try {
+    const AliceRecord = await web5.dwn.records.query({
+      from: ALICE_DID,
+      message: {
+        filter: {
+          schema: VCProtocolDefinition.types.credential.schema,
+          dataFormat: 'application/vc+jwt',
+          protocolPath: 'credential',
+          protocol: VCProtocolDefinition.protocol,
+        },
+        dateSort: 'createdDescending'
+      },
+    });
+    if (typeof AliceRecord === 'undefined') {
+      throw new Error("There is an error in the way you are filtering for records.");
+    }
+    var alice_record_id = '';
+    if (AliceRecord.status.code == 200) {
+      alice_record_id = AliceRecord.records[0].id;
+    }
+    console.log("Alice record ID is: ", alice_record_id);
+  } catch (error) {
+    console.error("An error occured while getting the record ID from Alice's DWN");
+    throw new Error(error);
+  }
